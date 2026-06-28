@@ -13,7 +13,38 @@ The Hybrid Search RAG (Retrieval-Augmented Generation) Assistant is a powerful, 
 - **Evaluation Dashboard**: Tracks query history, average retrieval time, and confidence metrics.
 
 ## Architecture
-The application follows a standard RAG pipeline enhanced with advanced retrieval techniques:
+The application follows a standard RAG pipeline enhanced with advanced retrieval techniques. 
+
+```mermaid
+graph TD
+    A[User PDF Documents] -->|Chunking| B(LangChain PyPDFLoader)
+    B --> C[(FAISS Vector Store)]
+    B --> D[(BM25 Sparse Index)]
+    
+    E[User Query] --> F{Hybrid Retrieval}
+    F -->|Semantic Search| C
+    F -->|Keyword Search| D
+    
+    C --> G[Dense Candidates]
+    D --> H[Sparse Candidates]
+    
+    G --> I(Reciprocal Rank Fusion - RRF)
+    H --> I
+    
+    I --> J[Fused Candidates]
+    J --> K(Cross-Encoder Reranker)
+    
+    K --> L{Confidence Score Check}
+    
+    L -- Low Score / No Docs --> M[Fallback: General Knowledge]
+    L -- High Score --> N[Context Injected into Prompt]
+    
+    M --> O[Qwen2.5 LLM]
+    N --> O
+    
+    O --> P[Streamed Response to User]
+```
+
 1. **Document Processing**: PDFs are loaded, split into overlapping chunks, and vectorized.
 2. **Hybrid Retrieval**:
    - FAISS retrieves chunks based on semantic similarity.
