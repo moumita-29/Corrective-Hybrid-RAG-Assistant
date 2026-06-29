@@ -95,21 +95,6 @@ graph TD
 3. Upload one or more PDFs using the sidebar or main uploader.
 4. Start chatting!
 
-## Screenshots
-
-*(Note: Replace the placeholder image paths below with actual screenshots of your running application)*
-
-### Home Page
-![Home Page](assets/home.png)
-
-### PDF Upload
-![PDF Upload](assets/upload.png)
-
-### RAG Answer with Citations
-![RAG Answer](assets/retrieval.png)
-
-### Fallback Response
-![Fallback Response](assets/fallback.png)
 
 ## Future Improvements
 - **Agentic Workflows**: Introduce multi-step reasoning capabilities for complex queries.
