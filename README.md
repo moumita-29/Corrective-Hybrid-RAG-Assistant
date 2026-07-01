@@ -1,4 +1,4 @@
-# Hybrid Search RAG Assistant
+# Corrective Hybrid Search RAG Assistant
 
 ## Project Overview
 The Corrective Hybrid RAG (Retrieval-Augmented Generation) Assistant is a powerful, locally-run AI application designed to intelligently query and chat with your PDF documents. It uses a combination of semantic search (FAISS) and keyword search (BM25) merged via Reciprocal Rank Fusion, followed by a Cross-Encoder reranking step to retrieve the most highly relevant context. 
