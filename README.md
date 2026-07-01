@@ -34,15 +34,24 @@ graph TD
     I --> J[Fused Candidates]
     J --> K(Cross-Encoder Reranker)
     
-    K --> L{Confidence Score Check}
+    K --> Q[Document Grader]
+    Q --> R[Knowledge Refinement]
     
-    L -- Low Score / No Docs --> M[Fallback: General Knowledge]
+    R --> L{Confidence Score Check}
+    
+    L -- Low Score --> S[Query Rewrite]
+    S --> T[Second Retrieval]
+    T --> L
+    
     L -- High Score --> N[Context Injected into Prompt]
+    L -- Repeated Failure --> M[Fallback: General Knowledge]
     
     M --> O[Qwen2.5 LLM]
     N --> O
     
-    O --> P[Streamed Response to User]
+    O --> U{Answer Verification}
+    U -- FAIL --> O
+    U -- PASS --> P[Streamed Response to User]
 ```
 
 1. **Document Processing**: PDFs are loaded, split into overlapping chunks, and vectorized.

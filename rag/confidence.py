@@ -8,31 +8,52 @@ Supports two score types:
 import math
 
 
-def compute_confidence(results, score_type="l2"):
-    """Compute a confidence score from retrieval results.
+def compute_confidence(chunks):
+    """Compute a unified confidence score combining multiple retrieval and grading signals.
+
+    Combines:
+    - Dense retrieval score (FAISS L2 distance -> cosine similarity)
+    - BM25 score (normalized to ~0-1)
+    - Cross Encoder score (logits -> probability)
+    - Document Grader score (0-100 -> 0-1)
 
     Args:
-        results: List of (Document, score) tuples.
-        score_type: "l2" for FAISS L2 distances,
-                    "reranker" for cross-encoder logits.
+        chunks: List of chunk dictionaries from refine_knowledge/retrieve pipeline.
+                Expected to have keys: "doc" (with metadata scores), "score" (CrossEncoder), "grade" (with confidence).
 
     Returns:
-        Tuple of (score, label, emoji):
-        - score: Float 0-100 representing confidence percentage.
-        - label: "High", "Medium", or "Low".
-        - emoji: "🟢", "🟡", or "🔴".
+        Tuple of (score, label, emoji).
     """
-    if not results:
+    if not chunks:
         return 0.0, "Low", "🔴"
 
-    if score_type == "reranker":
-        # Cross-encoder outputs raw logits → sigmoid → probability
-        probs = [1.0 / (1.0 + math.exp(-score)) for _, score in results]
-        avg_confidence = sum(probs) / len(probs) * 100
-    else:
-        # FAISS L2 distances → cosine similarity for normalized embeddings
-        cos_sims = [max(0.0, 1.0 - (score ** 2) / 2.0) for _, score in results]
-        avg_confidence = sum(cos_sims) / len(cos_sims) * 100
+    chunk_scores = []
+    
+    for chunk in chunks:
+        doc = chunk["doc"]
+        ce_score = chunk["score"]
+        grade_conf = chunk["grade"].get("confidence", 0)
+
+        # 1. FAISS L2 -> Normalized (0 to 1). Lower L2 is better. 
+        # Using typical cosine similarity approx: max(0, 1 - L2^2 / 2)
+        faiss_raw = doc.metadata.get("faiss_score", 1.0) # default to neutral distance if missing
+        faiss_norm = max(0.0, 1.0 - (faiss_raw ** 2) / 2.0)
+        
+        # 2. BM25 -> Normalized (0 to 1). BM25 is unbounded, but typically 0-10 for short chunks.
+        bm25_raw = doc.metadata.get("bm25_score", 0.0)
+        bm25_norm = min(1.0, bm25_raw / 10.0) # Simple heuristic normalization
+        
+        # 3. Cross Encoder -> Sigmoid probability (0 to 1)
+        ce_norm = 1.0 / (1.0 + math.exp(-ce_score))
+        
+        # 4. Document Grader -> (0 to 1)
+        grade_norm = grade_conf / 100.0
+        
+        # Average the four normalized signals for this chunk
+        combined = (faiss_norm + bm25_norm + ce_norm + grade_norm) / 4.0
+        chunk_scores.append(combined)
+        
+    avg_confidence = (sum(chunk_scores) / len(chunk_scores)) * 100.0
 
     if avg_confidence >= 70:
         return round(avg_confidence, 1), "High", "🟢"

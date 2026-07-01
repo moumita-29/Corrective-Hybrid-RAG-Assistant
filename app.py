@@ -15,8 +15,9 @@ import warnings
 
 from rag.loader import load_and_chunk_pdf
 from rag.vector_store import build_index, load_index, add_documents
-from rag.chain import retrieve, generate_stream, fallback_stream
+from rag.chain import retrieve, generate_stream, fallback_stream, rewrite_query
 from rag.bm25 import BM25Index
+from rag.answer_verifier import verify_answer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -109,16 +110,16 @@ def main():
     with st.sidebar:
         st.title("⚙️ Configuration")
 
-        # HF API check
-        from config import HF_LLM_MODEL
-        if os.environ.get("HF_TOKEN"):
-            st.success("✅ HF_TOKEN is configured")
+        # Groq API check
+        from config import GROQ_LLM_MODEL
+        if os.environ.get("GROQ_API_KEY"):
+            st.success("✅ GROQ_API_KEY is configured")
         else:
-            st.error("❌ HF_TOKEN is missing in .env")
+            st.error("❌ GROQ_API_KEY is missing in .env")
 
         st.markdown("---")
         st.markdown("**Models**")
-        st.info(f"🤖 LLM: {HF_LLM_MODEL.split('/')[-1]} (API)")
+        st.info(f"🤖 LLM: {GROQ_LLM_MODEL} (Groq API)")
         
         from config import EMBEDDING_MODEL, RERANKER_MODEL
         st.info(f"📐 Embeddings: {EMBEDDING_MODEL}")
@@ -182,42 +183,99 @@ def main():
                     st.write(user_input)
 
                 with st.chat_message("assistant"):
-                    # Step 1: Retrieve relevant chunks (now using hybrid search)
-                    with st.spinner("Searching documents (may download AI models on first run)..."):
-                        context_parts, sources, confidence, debug_info = retrieve(
-                            user_input, 
-                            st.session_state.vector_store,
-                            st.session_state.bm25_index
-                        )
-                        st.session_state.last_debug_info = debug_info
-                        if debug_info:
-                            st.session_state.metrics.append(debug_info)
-
                     # Get recent history
                     from config import MEMORY_WINDOW, FALLBACK_THRESHOLD
                     recent_history = st.session_state.chat_history[-MEMORY_WINDOW:] if st.session_state.chat_history else None
 
-                    # Step 2: Determine Fallback
-                    conf_score = confidence[0] if confidence else 0.0
-                    conf_label = confidence[1] if confidence else "Low"
-                    
-                    is_fallback = False
-                    if not context_parts or conf_score < FALLBACK_THRESHOLD or conf_label == "Low":
-                        is_fallback = True
+                    # Intent Routing for Follow-ups
+                    is_history_only = False
+                    if recent_history:
+                        from rag.chain import route_query
+                        with st.spinner("Analyzing intent..."):
+                            is_history_only = route_query(user_input, recent_history)
 
-                    display_source_badge(is_fallback, confidence)
-
-                    if is_fallback:
-                        logger.info(f"Fallback triggered for query: '{user_input}'. Score: {conf_score}")
-                        st.info("No relevant information was found in the uploaded documents. The following answer is generated using the model's general knowledge.")
+                    if is_history_only:
+                        st.info("ℹ️ Follow-up detected: Answering from recent conversation memory.")
                         answer = st.write_stream(fallback_stream(user_input, recent_history))
-                        sources = []  # Clear sources to avoid fake citations
+                        sources = []
+                        confidence = (100.0, "High", "🟢")
+                        is_fallback = False
+                        st.session_state.last_debug_info = None
+                        # No verification for conversational follow-ups
                     else:
-                        logger.info(f"RAG triggered for query: '{user_input}'. Score: {conf_score}")
-                        answer = st.write_stream(
-                            generate_stream(user_input, context_parts, recent_history)
-                        )
+                        # Step 1: Retrieve relevant chunks (now using hybrid search)
+                        with st.spinner("Searching documents (may download AI models on first run)..."):
+                            context_parts, sources, confidence, debug_info = retrieve(
+                                user_input, 
+                                st.session_state.vector_store,
+                                st.session_state.bm25_index
+                            )
+                            st.session_state.last_debug_info = debug_info
+                            if debug_info:
+                                st.session_state.metrics.append(debug_info)
 
+                        # Step 2: Adaptive Routing (CRAG)
+                        conf_score = confidence[0] if confidence else 0.0
+                        conf_label = confidence[1] if confidence else "Low"
+                        
+                        is_fallback = False
+                        # Adaptive Routing: If confidence is below threshold, rewrite and retrieve again
+                        if not context_parts or conf_score < FALLBACK_THRESHOLD or conf_label == "Low":
+                            st.info(f"Confidence ({conf_score:.1f}%) below threshold ({FALLBACK_THRESHOLD}%). Rewriting query...")
+                            
+                            # We use the original user_input to rewrite
+                            final_query = rewrite_query(user_input, recent_history)
+                            st.info(f"**Adaptive Rewrite:** '{final_query}'")
+                            
+                            with st.spinner("Executing adaptive re-retrieval..."):
+                                context_parts, sources, confidence, new_debug_info = retrieve(
+                                    final_query, 
+                                    st.session_state.vector_store,
+                                    st.session_state.bm25_index
+                                )
+                                new_debug_info["original_pass"] = debug_info
+                                new_debug_info["rewritten_query"] = final_query
+                                
+                                st.session_state.last_debug_info = new_debug_info
+                                if new_debug_info:
+                                    st.session_state.metrics.append(new_debug_info)
+                            
+                            conf_score = confidence[0] if confidence else 0.0
+                            conf_label = confidence[1] if confidence else "Low"
+                            
+                            # If still below threshold, trigger final LLM fallback
+                            if not context_parts or conf_score < FALLBACK_THRESHOLD or conf_label == "Low":
+                                is_fallback = True
+
+                        display_source_badge(is_fallback, confidence)
+
+                        if is_fallback:
+                            logger.info(f"Fallback triggered for query: '{user_input}'. Score: {conf_score}")
+                            st.info("No relevant information was found in the uploaded documents. The following answer is generated using the model's general knowledge.")
+                            answer = st.write_stream(fallback_stream(user_input, recent_history))
+                            sources = []  # Clear sources to avoid fake citations
+                        else:
+                            logger.info(f"RAG triggered for query: '{user_input}'. Score: {conf_score}")
+                            answer = st.write_stream(
+                                generate_stream(user_input, context_parts, recent_history)
+                            )
+                            
+                            # --- Answer Verification ---
+                            with st.spinner("Verifying answer..."):
+                                from rag.answer_verifier import verify_answer
+                                verification_status = verify_answer(user_input, context_parts, answer)
+                                
+                            if verification_status == "FAIL":
+                                st.warning("⚠️ **Verification Warning**: The answer may hallucinate or contradict the context. Regenerating...")
+                                logger.info(f"Answer verification failed for query: '{user_input}'. Regenerating.")
+                                answer = st.write_stream(
+                                    generate_stream(user_input, context_parts, recent_history)
+                                )
+                                # Add a small tag to sources
+                                for s in sources:
+                                    s["content"] = "[REGENERATED] " + s["content"]
+                            else:
+                                st.success("✅ Answer verified (Grounded).")
                     # Step 4: Show sources below the answer
                     display_sources(sources)
 
@@ -229,22 +287,82 @@ def main():
                         "confidence": confidence,
                         "is_fallback": is_fallback,
                     })
+                    
+                    # Step 6: Structured Logging
+                    import json
+                    debug_info = st.session_state.last_debug_info or {}
+                    log_payload = {
+                        "event": "crag_query_completed",
+                        "query": user_input,
+                        "rewritten_query": debug_info.get("rewritten_query"),
+                        "routing_decision": "Fallback" if is_fallback else ("RAG (Rewritten)" if debug_info.get("original_pass") else "RAG (Direct)"),
+                        "confidence_score": confidence[0] if confidence else 0.0,
+                        "latency_sec": debug_info.get("time_taken_sec", 0.0),
+                        "grading_summary": [
+                            {"score": c.get("score", 0), "grade": c.get("grade", {}).get("label", "Unknown") if isinstance(c.get("grade"), dict) else c.get("grade")}
+                            for c in debug_info.get("chunks", [])
+                        ]
+                    }
+                    logger.info(json.dumps(log_payload))
         else:
             st.info("📄 Upload PDF documents to get started.")
 
     with tab2:
         st.header("🔍 Retrieval Inspector")
-        st.markdown("Examine the exact chunks retrieved by the Hybrid Search engine for your latest query.")
+        st.markdown("Examine the routing path, grading results, and context chunks for your latest query.")
         
         if st.session_state.last_debug_info:
             debug = st.session_state.last_debug_info
+            
+            # --- Metrics & Routing ---
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Confidence Score", f"{debug.get('confidence_score', 0):.1f}%")
+            
+            attempts = 2 if debug.get("original_pass") else 1
+            col2.metric("Retrieval Attempts", attempts)
+            
             if not debug.get("chunks"):
+                col3.metric("Routing Path", "Fallback (No Context)")
                 st.info("No chunks were retrieved for the last query.")
             else:
-                st.metric("Time Taken (s)", f"{debug.get('time_taken_sec', 0):.2f}")
+                # Basic routing logic based on history
+                last_msg = st.session_state.chat_history[-1] if st.session_state.chat_history else {}
+                routing = "Fallback" if last_msg.get("is_fallback") else ("RAG (Rewritten)" if attempts > 1 else "RAG (Direct)")
+                col3.metric("Routing Path", routing)
+                
+                # --- NEW: Comparison Debug Metrics ---
+                if "comp_debug" in debug and debug["comp_debug"]:
+                    cd = debug["comp_debug"]
+                    st.subheader("📚 Multi-Document Diversity Filtering")
+                    c1, c2, c3, c4 = st.columns(4)
+                    c1.metric("Indexed PDFs", cd.get("total_indexed_pdfs", 0))
+                    c2.metric("Before Reranking", cd.get("pdfs_before_reranking", 0))
+                    c3.metric("After Reranking", cd.get("pdfs_after_reranking", 0))
+                    c4.metric("Removed by Grader", cd.get("pdfs_removed_by_grading", 0))
+                
+                # --- Grading Results & Context ---
+                st.subheader(f"Final Context Chunks ({debug.get('num_chunks_retrieved', 0)} kept)")
+                if debug.get("rewritten_query"):
+                    st.info(f"**Query was rewritten to:** '{debug['rewritten_query']}'")
+                
+                # Show chunks
                 for i, chunk in enumerate(debug["chunks"], 1):
-                    with st.expander(f"Rank {i} | Score: {chunk['score']:.4f} | {chunk['source']} (Page {chunk['page']})"):
+                    grade_label = chunk.get("grade", {}).get("label", "Unknown") if isinstance(chunk.get("grade"), dict) else chunk.get("grade", "Unknown")
+                    grade_color = "🟢" if grade_label == "Correct" else ("🟡" if grade_label == "Ambiguous" else "🔴")
+                    
+                    with st.expander(f"Rank {i} | {grade_color} {grade_label} | Score: {chunk['score']:.4f} | {chunk['source']} (Page {chunk['page']})"):
+                        if isinstance(chunk.get("grade"), dict):
+                            st.caption(f"**Grader Reasoning:** {chunk['grade'].get('explanation', 'N/A')}")
                         st.markdown(chunk["content"])
+                
+                if debug.get("original_pass"):
+                    st.divider()
+                    st.subheader("Failed First Pass Chunks (Before Rewrite)")
+                    for i, chunk in enumerate(debug["original_pass"]["chunks"], 1):
+                        grade_label = chunk.get("grade", {}).get("label", "Unknown") if isinstance(chunk.get("grade"), dict) else chunk.get("grade", "Unknown")
+                        grade_color = "🟢" if grade_label == "Correct" else ("🟡" if grade_label == "Ambiguous" else "🔴")
+                        with st.expander(f"[Attempt 1] Rank {i} | {grade_color} {grade_label} | Score: {chunk['score']:.4f}"):
+                            st.markdown(chunk["content"])
         else:
             st.info("Ask a question in the chat to see retrieval diagnostics.")
 

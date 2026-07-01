@@ -7,8 +7,8 @@ Change these values to swap models or adjust behavior.
 # --- Embedding Model (Swapped for speed) ---
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
-# --- LLM (Hugging Face API) ---
-HF_LLM_MODEL = "Qwen/Qwen2.5-7B-Instruct"
+# --- LLM (Groq API) ---
+GROQ_LLM_MODEL = "llama-3.3-70b-versatile"
 
 # --- Chunking ---
 CHUNK_SIZE = 1000
