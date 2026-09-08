@@ -1,0 +1,23 @@
+
+=== Bucket: unanswerable ===
+Routing accuracy: 2/3 correctly triggered fallback (declined to answer from documents)
+(RAGAS faithfulness/relevancy don't apply here ù there's no grounded answer to score.)
+
+=== Bucket: single_doc (12 scored)
+
+--- RAGAS Evaluation Results ---
+Faithfulness: 1.0000
+Answer Relevancy: 0.8613
+Context Precision: 0.8889
+Context Recall: 0.8333
+
+=== Bucket: comparison (2 scored)
+
+--- RAGAS Evaluation Results ---
+Faithfulness: 0.7500
+Answer Relevancy: 0.5539
+Context Precision: 1.0000
+Context Recall: 0.5833
+
+=== Done ===
+Interpretation reminder: a good faithfulness/relevancy score on single_doc/comparison alongside near-100% routing accuracy on unanswerable is the story to report ù not one blended number.

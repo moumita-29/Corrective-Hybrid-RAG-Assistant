@@ -64,9 +64,25 @@ def run_evaluation(eval_data: list):
         
         logger.info("Evaluation complete!")
         print("\n--- RAGAS Evaluation Results ---")
-        for metric, score in results.items():
-            print(f"{metric.replace('_', ' ').title()}: {score:.4f}")
-            
+
+        # Newer ragas versions (0.2+) return an EvaluationResult object with
+        # no .items() method — use .to_pandas() and average each metric
+        # column instead. Older versions returned a plain dict, so fall
+        # back to that if to_pandas() isn't available.
+        try:
+            df = results.to_pandas()
+            metric_names = [m.name if hasattr(m, "name") else str(m) for m in metrics]
+            for metric in metric_names:
+                if metric in df.columns:
+                    score = df[metric].mean(skipna=True)
+                    print(f"{metric.replace('_', ' ').title()}: {score:.4f}")
+                else:
+                    print(f"{metric.replace('_', ' ').title()}: (column not found in results)")
+        except AttributeError:
+            # Older ragas: results behaves like a dict
+            for metric, score in results.items():
+                print(f"{metric.replace('_', ' ').title()}: {score:.4f}")
+
         return results
     except Exception as e:
         logger.error(f"Error during RAGAS evaluation: {str(e)}")

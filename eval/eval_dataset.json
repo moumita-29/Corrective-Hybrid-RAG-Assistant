@@ -1,0 +1,121 @@
+[
+  {
+    "id": "vit_1",
+    "bucket": "single_doc",
+    "expected_source": "Transformers_For_Image_Recognition (ViT)",
+    "question": "What patch size does the ViT-L/16 model use, and how are patches turned into input tokens for the Transformer encoder?",
+    "ground_truth": "ViT-L/16 uses 16x16 pixel patches. The image is split into fixed-size patches, each patch is flattened and linearly projected into a D-dimensional embedding, a learnable position embedding is added, and a learnable [class] token is prepended to the sequence before feeding it into a standard Transformer encoder."
+  },
+  {
+    "id": "vit_2",
+    "bucket": "single_doc",
+    "expected_source": "Transformers_For_Image_Recognition (ViT)",
+    "question": "What top-1 accuracy did ViT-H/14 achieve on ImageNet after pre-training on JFT-300M?",
+    "ground_truth": "88.55% (+/- 0.04) top-1 accuracy on ImageNet."
+  },
+  {
+    "id": "vit_3",
+    "bucket": "single_doc",
+    "expected_source": "Transformers_For_Image_Recognition (ViT)",
+    "question": "Why does ViT underperform comparable ResNets when trained only on ImageNet without large-scale pre-training?",
+    "ground_truth": "ViT lacks CNN-specific inductive biases such as translation equivariance and locality, which normally help models generalize on small/medium datasets. Without enough training data, ViT can't learn these spatial relationships from scratch as effectively, so it yields a few percentage points lower accuracy than similarly-sized ResNets on mid-sized datasets like ImageNet alone."
+  },
+  {
+    "id": "vit_4",
+    "bucket": "single_doc",
+    "expected_source": "Transformers_For_Image_Recognition (ViT)",
+    "question": "Which optimizer did the ViT authors use to pre-train their ResNet baselines, and why?",
+    "ground_truth": "Adam (not the conventional SGD), because they found in controlled experiments that Adam pre-training outperformed SGD pre-training on most datasets and on average when pre-training ResNets on JFT."
+  },
+  {
+    "id": "transformer_1",
+    "bucket": "single_doc",
+    "expected_source": "NIPS-2017-attention-is-all-you-need",
+    "question": "How many attention heads does the base Transformer model use, and what are the dimensions dk and dv per head?",
+    "ground_truth": "The base model uses h = 8 parallel attention heads, with dk = dv = dmodel / h = 64 per head."
+  },
+  {
+    "id": "transformer_2",
+    "bucket": "single_doc",
+    "expected_source": "NIPS-2017-attention-is-all-you-need",
+    "question": "What BLEU score did the 'big' Transformer model achieve on the WMT 2014 English-to-German translation task, and how long did it take to train?",
+    "ground_truth": "28.4 BLEU, a new state-of-the-art result at the time, achieved after training for 3.5 days (300,000 steps) on 8 NVIDIA P100 GPUs."
+  },
+  {
+    "id": "transformer_3",
+    "bucket": "single_doc",
+    "expected_source": "NIPS-2017-attention-is-all-you-need",
+    "question": "What kind of positional encoding does the Transformer use by default, and what alternative did the authors also test?",
+    "ground_truth": "By default it uses fixed sine and cosine functions of different frequencies (sinusoidal positional encoding) added to the input embeddings. They also tested learned positional embeddings and found nearly identical results, but kept the sinusoidal version because it may let the model extrapolate to sequence lengths longer than those seen during training."
+  },
+  {
+    "id": "transformer_4",
+    "bucket": "single_doc",
+    "expected_source": "NIPS-2017-attention-is-all-you-need",
+    "question": "What are dmodel and dff (the inner feed-forward layer dimensionality) for the base Transformer model?",
+    "ground_truth": "dmodel = 512 and dff = 2048 for the base model."
+  },
+  {
+    "id": "sql_1",
+    "bucket": "single_doc",
+    "expected_source": "To_RAG_or_Not_to_RAG (Shakespeare-SQL)",
+    "question": "What full coverage did Shakespeare-SQL achieve on the AmbiQT benchmark, and how many training examples did it use to get there?",
+    "ground_truth": "Shakespeare-SQL achieved 72.6% full coverage on AmbiQT using only 300 Ambrosia training examples, compared to DFPL's 53.2% despite DFPL being fine-tuned on the full 10,070-example AmbiQT training set."
+  },
+  {
+    "id": "sql_2",
+    "bucket": "single_doc",
+    "expected_source": "To_RAG_or_Not_to_RAG (Shakespeare-SQL)",
+    "question": "What three categories does Shakespeare-SQL's Question Classifier route incoming questions into?",
+    "ground_truth": "Unanswerable (U), Answerable-Unambiguous (AU), and Answerable-Ambiguous (AA)."
+  },
+  {
+    "id": "sql_3",
+    "bucket": "single_doc",
+    "expected_source": "To_RAG_or_Not_to_RAG (Shakespeare-SQL)",
+    "question": "What reward model is used to score generated interpretations during the GRPO curriculum training of the interpretation generator?",
+    "ground_truth": "Claude Sonnet 4.5 (used as an LLM-as-judge to evaluate interpretation quality with temperature 0)."
+  },
+  {
+    "id": "sql_4",
+    "bucket": "single_doc",
+    "expected_source": "To_RAG_or_Not_to_RAG (Shakespeare-SQL)",
+    "question": "What is the Ambrosia+ benchmark, and how many unanswerable questions does it add on top of the original Ambrosia benchmark?",
+    "ground_truth": "Ambrosia+ extends the original Ambrosia benchmark (4,242 answerable questions across 16 domains) by adding 2,535 unanswerable questions, generated using Claude Sonnet 4.5 and validated by human experts plus Qwen2.5-Coder-32B, for a total of 6,777 examples across 16 domains."
+  },
+  {
+    "id": "compare_1",
+    "bucket": "comparison",
+    "expected_source": "Transformers_For_Image_Recognition + NIPS-2017-attention-is-all-you-need",
+    "question": "Compare how the original Transformer paper and the ViT paper each define the 'tokens' fed into self-attention.",
+    "ground_truth": "In the original Transformer, tokens are word/subword embeddings in a natural language sequence, combined with positional encodings. In ViT, tokens are flattened image patches (e.g. 16x16 pixel blocks) linearly projected into embeddings, plus an extra learnable [class] token, with position embeddings added to retain spatial ordering -- ViT explicitly treats image patches the same way NLP treats words."
+  },
+  {
+    "id": "compare_2",
+    "bucket": "comparison",
+    "expected_source": "Transformers_For_Image_Recognition + NIPS-2017-attention-is-all-you-need",
+    "question": "Both papers considered learned versus fixed positional encodings. What did each paper conclude?",
+    "ground_truth": "The Transformer paper defaults to fixed sinusoidal positional encodings but found learned positional embeddings gave nearly identical results. ViT similarly found little to no difference between 1D learned embeddings, 2D-aware embeddings, and relative positional embeddings, and used standard learnable 1D position embeddings as its default. Both papers converge on the finding that the specific encoding scheme matters less than having positional information at all."
+  },
+  {
+    "id": "unanswerable_1",
+    "bucket": "unanswerable",
+    "expected_source": null,
+    "question": "According to these documents, what was Google's market capitalization in 2021?",
+    "ground_truth": "Not answerable from these documents. None of the three papers (ViT, Attention Is All You Need, Shakespeare-SQL) discuss company financials or market capitalization; the system should decline or state insufficient information rather than fabricate a figure."
+  },
+  {
+    "id": "unanswerable_2",
+    "bucket": "unanswerable",
+    "expected_source": null,
+    "question": "What accuracy did Shakespeare-SQL achieve on the ImageNet classification benchmark?",
+    "ground_truth": "Not answerable / trick question. Shakespeare-SQL is a Text-to-SQL framework evaluated on AmbiQT, Ambrosia+, SPIDER, and BIRD -- it was never evaluated on ImageNet. ImageNet results in the corpus belong only to the ViT paper. The system should not conflate the two documents or invent a number."
+  },
+  {
+    "id": "unanswerable_3",
+    "bucket": "unanswerable",
+    "expected_source": null,
+    "question": "How much GPU memory is required to train GPT-4 according to these papers?",
+    "ground_truth": "Not answerable from these documents. None of the three papers mention GPT-4 or its training hardware requirements; the system should decline rather than guess."
+  }
+]

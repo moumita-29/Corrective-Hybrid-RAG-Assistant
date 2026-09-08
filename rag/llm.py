@@ -29,9 +29,20 @@ def get_llm():
         if not os.environ.get("GROQ_API_KEY"):
             raise ValueError("GROQ_API_KEY is missing! Please add it to your .env file or Streamlit secrets.")
 
-        _llm = ChatGroq(
+        llm_kwargs = dict(
             model_name=GROQ_LLM_MODEL,
             api_key=os.environ.get("GROQ_API_KEY"),
-            temperature=0.0
+            temperature=0.0,
         )
+
+        # GPT-OSS models are reasoning models: by default they spend extra,
+        # invisible tokens on chain-of-thought before the final answer, which
+        # eats into Groq's tight per-model TPM budget fast. "low" keeps
+        # reasoning brief while still improving over no reasoning at all.
+        # (reasoning_effort is only accepted by GPT-OSS 20B/120B — passing it
+        # for other models can error, so gate it explicitly.)
+        if "gpt-oss" in GROQ_LLM_MODEL:
+            llm_kwargs["reasoning_effort"] = "low"
+
+        _llm = ChatGroq(**llm_kwargs)
     return _llm

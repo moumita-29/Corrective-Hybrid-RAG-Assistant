@@ -1,0 +1,667 @@
+[
+  {
+    "id": "vit_1",
+    "bucket": "single_doc",
+    "expected_source": "Transformers_For_Image_Recognition (ViT)",
+    "question": "What patch size does the ViT-L/16 model use, and how are patches turned into input tokens for the Transformer encoder?",
+    "ground_truth": "ViT-L/16 uses 16x16 pixel patches. The image is split into fixed-size patches, each patch is flattened and linearly projected into a D-dimensional embedding, a learnable position embedding is added, and a learnable [class] token is prepended to the sequence before feeding it into a standard Transformer encoder.",
+    "answer": "The ViT\u2011L/16 model uses a **16\u202f\u00d7\u202f16 pixel patch size** (the \u201c/16\u201d suffix indicates a 16\u2011by\u201116 input patch)\u3010temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, page\u202f5\u3011.  \n\nTo convert those image patches into the token sequence that the Transformer encoder processes, the following steps are applied\u3010temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, page\u202f3\u3011:\n\n1. **Patch extraction and flattening** \u2013 The image is divided into non\u2011overlapping 16\u202f\u00d7\u202f16 patches, and each patch is flattened into a one\u2011dimensional vector.  \n2. **Linear projection** \u2013 A trainable linear layer maps each flattened patch vector to a fixed\u2011dimensional latent space of size **D** (the same dimensionality used throughout all Transformer layers). The output of this projection is called a **patch embedding**.  \n3. **Position encoding** \u2013 Learnable 1\u2011D position embeddings are added to the patch embeddings so the model can retain spatial information.  \n4. **Class token** \u2013 A learnable \u201cclass\u201d embedding (analogous to BERT\u2019s `[CLS]` token) is prepended to the sequence of patch embeddings. The final sequence, consisting of the class token followed by the position\u2011augmented patch embeddings, serves as the input token stream for the Transformer encoder.  \n\nThus, ViT\u2011L/16 works with 16\u202f\u00d7\u202f16 patches, each of which is flattened and linearly projected into a token embedding before being fed (with positional information and a class token) into the Transformer.",
+    "contexts": [
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 5]\nsummarized in Table 1. The \u201cBase\u201d and \u201cLarge\u201d models are directly adopted from BERT and we\nadd the larger \u201cHuge\u201d model. In what follows we use brief notation to indicate the model size and\nthe input patch size: for instance, ViT-L/16 means the \u201cLarge\u201d variant with16\u00d7 16 input patch size.\nNote that the Transformer\u2019s sequence length is inversely proportional to the square of the patch size,\nthus models with smaller patch size are computationally more expensive.\nFor the baseline CNNs, we use ResNet (He et al., 2016), but replace the Batch Normalization lay-\ners (Ioffe & Szegedy, 2015) with Group Normalization (Wu & He, 2018), and used standardized\nconvolutions (Qiao et al., 2019). These modi\ufb01cations improve transfer (Kolesnikov et al., 2020),\nand we denote the modi\ufb01ed model \u201cResNet (BiT)\u201d. For the hybrids, we feed the intermediate fea-\nture maps into ViT with patch size of one \u201cpixel\u201d. To experiment with different sequence lengths,",
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 3]\nTransformer. The Transformer uses constant latent vector size D through all of its layers, so we\n\ufb02atten the patches and map to D dimensions with a trainable linear projection (Eq. 1). We refer to\nthe output of this projection as the patch embeddings.\nSimilar to BERT\u2019s[class] token, we prepend a learnable embedding to the sequence of embed-\nded patches (z0\n0 = xclass), whose state at the output of the Transformer encoder ( z0\nL) serves as the\nimage representation y (Eq. 4). Both during pre-training and \ufb01ne-tuning, a classi\ufb01cation head is at-\ntached to z0\nL. The classi\ufb01cation head is implemented by a MLP with one hidden layer at pre-training\ntime and by a single linear layer at \ufb01ne-tuning time.\nPosition embeddings are added to the patch embeddings to retain positional information. We use\nstandard learnable 1D position embeddings, since we have not observed signi\ufb01cant performance\ngains from using more advanced 2D-aware position embeddings (Appendix D.4). The resulting"
+    ],
+    "confidence_score": 84.0,
+    "confidence_label": "High",
+    "is_fallback": false,
+    "num_chunks_retrieved": 2,
+    "grades": [
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "vit_2",
+    "bucket": "single_doc",
+    "expected_source": "Transformers_For_Image_Recognition (ViT)",
+    "question": "What top-1 accuracy did ViT-H/14 achieve on ImageNet after pre-training on JFT-300M?",
+    "ground_truth": "88.55% (+/- 0.04) top-1 accuracy on ImageNet.",
+    "answer": "The provided excerpt does not include a specific numeric value for the ImageNet top\u20111 accuracy of the ViT\u2011H/14 model after it was pre\u2011trained on the JFT\u2011300M dataset. It only shows a graph (Figure\u202f3) that illustrates the general trend that larger ViT models, such as ViT\u2011H/14, outperform BiT ResNets when pre\u2011trained on very large datasets, but the exact percentage is not listed in the text you shared. Therefore, based on the available context, I cannot give a precise top\u20111 accuracy figure for ViT\u2011H/14 on ImageNet.",
+    "contexts": [
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 7]\nPublished as a conference paper at ICLR 2021\nImageNet ImageNet-21k JFT-300M\nPre-training dataset\n70\n75\n80\n85\n90ImageNet Top1 Accuracy [%]\nBiT\nViT-B/32\nViT-B/16\nViT-L/32\nViT-L/16\nViT-H/14\nFigure 3: Transfer to ImageNet. While\nlarge ViT models perform worse than BiT\nResNets (shaded area) when pre-trained on\nsmall datasets, they shine when pre-trained on\nlarger datasets. Similarly, larger ViT variants\novertake smaller ones as the dataset grows.\n10 M 30 M 100 M 300 M\nNumber of JFT pre-training samples\n30\n40\n50\n60\n70Linear 5-shot ImageNet Top1 [%]\nViT-L/16\nViT-L/32\nViT-B/32\nViT-b/32\nResNet50x1 (BiT)\nResNet152x2 (BiT)\nFigure 4: Linear few-shot evaluation on Ima-\ngeNet versus pre-training size. ResNets per-\nform better with smaller pre-training datasets\nbut plateau sooner than ViT, which performs\nbetter with larger pre-training. ViT-b is ViT-B\nwith all hidden dimensions halved.\n102 103\n90\n95Transfer accuracy [%]\nAverage-5\nTransformer (ViT)\nResNet (BiT)\nHybrid\n102 10375\n80\n85\n90 ImageNet"
+    ],
+    "confidence_score": 87.7,
+    "confidence_label": "High",
+    "is_fallback": false,
+    "num_chunks_retrieved": 1,
+    "grades": [
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "FAIL"
+  },
+  {
+    "id": "vit_3",
+    "bucket": "single_doc",
+    "expected_source": "Transformers_For_Image_Recognition (ViT)",
+    "question": "Why does ViT underperform comparable ResNets when trained only on ImageNet without large-scale pre-training?",
+    "ground_truth": "ViT lacks CNN-specific inductive biases such as translation equivariance and locality, which normally help models generalize on small/medium datasets. Without enough training data, ViT can't learn these spatial relationships from scratch as effectively, so it yields a few percentage points lower accuracy than similarly-sized ResNets on mid-sized datasets like ImageNet alone.",
+    "answer": "ViT\u2019s weaker results on ImageNet\u2011only pre\u2011training stem from the fact that, unlike convolutional networks, it carries far fewer built\u2011in visual inductive biases.  Convolutional ResNets benefit from translation equivariance and locality, which let them learn useful patterns even when the training set is relatively modest.  ViT, by contrast, treats an image as a sequence of patches and relies on self\u2011attention to discover spatial relationships; without the strong priors that convolutions provide, it needs a much larger amount of data to learn those relationships reliably.\n\nThe paper\u2019s experiments confirm this intuition.  When ViT\u2011Large models are pre\u2011trained only on ImageNet (the smallest dataset in the study), they underperform ViT\u2011Base models despite applying moderate regularisation (weight decay, dropout, label smoothing) (see the discussion on page\u202f6).  Only after scaling the pre\u2011training data to ImageNet\u201121k or the massive JFT\u2011300M collection do the larger ViT models catch up and eventually surpass the ResNet\u2011based BiT models (page\u202f6\u20117).  In other words, the lack of convolutional inductive bias makes ViT highly data\u2011hungry, and on a dataset the size of ImageNet it simply does not receive enough examples to learn robust visual representations, leading to the observed under\u2011performance relative to comparable ResNets.",
+    "contexts": [
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 6]\nViT-H/14 outperforms BiT-R152x4, and other methods, on theNatural and Structured tasks. On the\nSpecialized the performance of the top two models is similar.\n4.3 P RE-TRAINING DATA REQUIREMENTS\nThe Vision Transformer performs well when pre-trained on a large JFT-300M dataset. With fewer\ninductive biases for vision than ResNets, how crucial is the dataset size? We perform two series of\nexperiments.\nFirst, we pre-train ViT models on datasets of increasing size: ImageNet, ImageNet-21k, and JFT-\n300M. To boost the performance on the smaller datasets, we optimize three basic regularization\nparameters \u2013 weight decay, dropout, and label smoothing. Figure 3 shows the results after \ufb01ne-\ntuning to ImageNet (results on other datasets are shown in Table 5) 2. When pre-trained on the\nsmallest dataset, ImageNet, ViT-Large models underperform compared to ViT-Base models, despite\n(moderate) regularization. With ImageNet-21k pre-training, their performances are similar. Only",
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 7]\nbetter with larger pre-training. ViT-b is ViT-B\nwith all hidden dimensions halved.\n102 103\n90\n95Transfer accuracy [%]\nAverage-5\nTransformer (ViT)\nResNet (BiT)\nHybrid\n102 10375\n80\n85\n90 ImageNet\nTransformer (ViT)\nResNet (BiT)\nHybrid\nTotal pre-training compute [exaFLOPs]\nFigure 5: Performance versus pre-training compute for different architectures: Vision Transformers,\nResNets, and hybrids. Vision Transformers generally outperform ResNets with the same compu-\ntational budget. Hybrids improve upon pure Transformers for smaller model sizes, but the gap\nvanishes for larger models.\nregion spanned by BiT models of different sizes. The BiT CNNs outperform ViT on ImageNet, but\nwith the larger datasets, ViT overtakes.\nSecond, we train our models on random subsets of 9M, 30M, and 90M as well as the full JFT-\n300M dataset. We do not perform additional regularization on the smaller subsets and use the same",
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 7]\nPublished as a conference paper at ICLR 2021\nImageNet ImageNet-21k JFT-300M\nPre-training dataset\n70\n75\n80\n85\n90ImageNet Top1 Accuracy [%]\nBiT\nViT-B/32\nViT-B/16\nViT-L/32\nViT-L/16\nViT-H/14\nFigure 3: Transfer to ImageNet. While\nlarge ViT models perform worse than BiT\nResNets (shaded area) when pre-trained on\nsmall datasets, they shine when pre-trained on\nlarger datasets. Similarly, larger ViT variants\novertake smaller ones as the dataset grows.\n10 M 30 M 100 M 300 M\nNumber of JFT pre-training samples\n30\n40\n50\n60\n70Linear 5-shot ImageNet Top1 [%]\nViT-L/16\nViT-L/32\nViT-B/32\nViT-b/32\nResNet50x1 (BiT)\nResNet152x2 (BiT)\nFigure 4: Linear few-shot evaluation on Ima-\ngeNet versus pre-training size. ResNets per-\nform better with smaller pre-training datasets\nbut plateau sooner than ViT, which performs\nbetter with larger pre-training. ViT-b is ViT-B\nwith all hidden dimensions halved.\n102 103\n90\n95Transfer accuracy [%]\nAverage-5\nTransformer (ViT)\nResNet (BiT)\nHybrid\n102 10375\n80\n85\n90 ImageNet",
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 2]\nPublished as a conference paper at ICLR 2021\ninherent to CNNs, such as translation equivariance and locality, and therefore do not generalize well\nwhen trained on insuf\ufb01cient amounts of data.\nHowever, the picture changes if the models are trained on larger datasets (14M-300M images). We\n\ufb01nd that large scale training trumps inductive bias. Our Vision Transformer (ViT) attains excellent\nresults when pre-trained at suf\ufb01cient scale and transferred to tasks with fewer datapoints. When\npre-trained on the public ImageNet-21k dataset or the in-house JFT-300M dataset, ViT approaches\nor beats state of the art on multiple image recognition benchmarks. In particular, the best model\nreaches the accuracy of 88.55% on ImageNet, 90.72% on ImageNet-ReaL, 94.55% on CIFAR-100,\nand 77.63% on the VTAB suite of 19 tasks.\n2 R ELATED WORK\nTransformers were proposed by Vaswani et al. (2017) for machine translation, and have since be-"
+    ],
+    "confidence_score": 88.0,
+    "confidence_label": "High",
+    "is_fallback": false,
+    "num_chunks_retrieved": 4,
+    "grades": [
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "vit_4",
+    "bucket": "single_doc",
+    "expected_source": "Transformers_For_Image_Recognition (ViT)",
+    "question": "Which optimizer did the ViT authors use to pre-train their ResNet baselines, and why?",
+    "ground_truth": "Adam (not the conventional SGD), because they found in controlled experiments that Adam pre-training outperformed SGD pre-training on most datasets and on average when pre-training ResNets on JFT.",
+    "answer": "The authors pre\u2011trained the ResNet baselines with the **Adam optimizer**. They arrived at this choice after a direct comparison with the more conventional stochastic\u2011gradient\u2011descent (SGD) optimizer. The experiments showed that Adam pre\u2011training consistently outperformed SGD on the majority of downstream datasets and also yielded a higher average performance. Because of these results, the authors selected Adam as the optimizer for pre\u2011training ResNets on the large\u2011scale JFT dataset. (See the discussion of SGD vs. Adam for ResNets in the supplementary analysis.)",
+    "contexts": [
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 16]\nSGD, we use the hyperparameters recommended by Kolesnikov et al. (2020). Results are presented\nin Table 7. Adam pre-training outperforms SGD pre-training on most datasets and on average.\nThis justi\ufb01es the choice of Adam as the optimizer used to pre-train ResNets on JFT. Note that the\nabsolute numbers are lower than those reported by Kolesnikov et al. (2020), since we pre-train only\nfor 7 epochs, not 30.\nD.2 T RANSFORMER SHAPE\nWe ran ablations on scaling different dimensions of the Transformer architecture to \ufb01nd out which\nare best suited for scaling to very large models. Figure 8 shows 5-shot performance on ImageNet\nfor different con\ufb01gurations. All con\ufb01gurations are based on a ViT model with 8 layers,D = 1024,\nDM LP = 2048 and a patch size of 32, the intersection of all lines. We can see that scaling the\ndepth results in the biggest improvements which are clearly visible up until 64 layers. However,",
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 15]\npaper. We show transfer accuracy on several datasets, as well as the pre-training compute (in ex-\naFLOPs).\nFigure 5 from the paper and shows the transfer performance of ViT, ResNet, and hybrid models of\nvarying size, as well as the estimated computational cost of their pre-training.\nD A DDITIONAL ANALYSES\nD.1 SGD VS. A DAM FOR RESNETS\nResNets are typically trained with SGD and our use of Adam as optimizer is quite unconventional.\nHere we show the experiments that motivated this choice. Namely, we compare the \ufb01ne-tuning\n15",
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 6]\nport mean and standard deviation of the accuracies, averaged over three \ufb01ne-tuning runs. Vision\nTransformer models pre-trained on the JFT-300M dataset outperform ResNet-based baselines on all\ndatasets, while taking substantially less computational resources to pre-train. ViT pre-trained on the\nsmaller public ImageNet-21k dataset performs well too. \u2217Slightly improved 88.5% result reported\nin Touvron et al. (2020).\nVTAB (19 tasks)\n65\n70\n75\n80Accuracy [%]\nNatural (7 tasks)\n70\n80\n90\nSpecialized (4 tasks)\n80\n82\n85\n88\n90\nStructured (8 tasks)\n50\n60\n70ViT-H/14 BiT-L (R152x4) VIVI-Ex-100% (R50x3) S4L (R50x1)\nFigure 2: Breakdown of VTAB performance in Natural, Specialized, and Structured task groups.\nmodel still took substantially less compute to pre-train than prior state of the art. However, we note\nthat pre-training ef\ufb01ciency may be affected not only by the architecture choice, but also other pa-"
+    ],
+    "confidence_score": 81.1,
+    "confidence_label": "High",
+    "is_fallback": false,
+    "num_chunks_retrieved": 3,
+    "grades": [
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "transformer_1",
+    "bucket": "single_doc",
+    "expected_source": "NIPS-2017-attention-is-all-you-need",
+    "question": "How many attention heads does the base Transformer model use, and what are the dimensions dk and dv per head?",
+    "ground_truth": "The base model uses h = 8 parallel attention heads, with dk = dv = dmodel / h = 64 per head.",
+    "answer": "The base Transformer model employs **eight (8) parallel attention heads**.  \nFor each head, the dimensionalities of the query, key and value projections are the same:\n\n- **\\(d_k = 64\\)**\n- **\\(d_v = 64\\)**  \n\nThese values arise because the model splits the overall model dimension (\\(d_{\\text{model}}\\)) evenly across the eight heads, giving \\(d_k = d_v = d_{\\text{model}}/h = 64\\).",
+    "contexts": [
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 5]\nMultiHead(Q,K,V ) = Concat(head 1,..., headh)W O\nwhere headi = Attention(QW Q\ni ,KW K\ni ,VW V\ni )\nWhere the projections are parameter matricesW Q\ni \u2208 Rdmodel\u00d7dk,W K\ni \u2208 Rdmodel\u00d7dk,W V\ni \u2208 Rdmodel\u00d7dv\nandW O\u2208 Rhdv\u00d7dmodel.\nIn this work we employ h = 8 parallel attention layers, or heads. For each of these we use\ndk =dv =dmodel/h = 64. Due to the reduced dimension of each head, the total computational cost\nis similar to that of single-head attention with full dimensionality.\n3.2.3 Applications of Attention in our Model\nThe Transformer uses multi-head attention in three different ways:\n\u2022 In \"encoder-decoder attention\" layers, the queries come from the previous decoder layer,\nand the memory keys and values come from the output of the encoder. This allows every\nposition in the decoder to attend over all positions in the input sequence. This mimics the\ntypical encoder-decoder attention mechanisms in sequence-to-sequence models such as\n[31, 2, 8]."
+    ],
+    "confidence_score": 89.4,
+    "confidence_label": "High",
+    "is_fallback": false,
+    "num_chunks_retrieved": 1,
+    "grades": [
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "transformer_2",
+    "bucket": "single_doc",
+    "expected_source": "NIPS-2017-attention-is-all-you-need",
+    "question": "What BLEU score did the 'big' Transformer model achieve on the WMT 2014 English-to-German translation task, and how long did it take to train?",
+    "ground_truth": "28.4 BLEU, a new state-of-the-art result at the time, achieved after training for 3.5 days (300,000 steps) on 8 NVIDIA P100 GPUs.",
+    "answer": "The \u201cbig\u201d Transformer model reached a BLEU score of **28.4** on the WMT\u202f2014 English\u2011to\u2011German translation task.  According to the paper, training this model required **3.5\u202fdays on eight P100 GPUs** (see the results discussion on page\u202f8 of the manuscript).",
+    "contexts": [
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 8]\n6 Results\n6.1 Machine Translation\nOn the WMT 2014 English-to-German translation task, the big transformer model (Transformer (big)\nin Table 2) outperforms the best previously reported models (including ensembles) by more than 2.0\nBLEU, establishing a new state-of-the-art BLEU score of 28.4. The con\ufb01guration of this model is\nlisted in the bottom line of Table 3. Training took 3.5 days on 8 P100 GPUs. Even our base model\nsurpasses all previously published models and ensembles, at a fraction of the training cost of any of\nthe competitive models.\nOn the WMT 2014 English-to-French translation task, our big model achieves a BLEU score of 41.0,\noutperforming all of the previously published single models, at less than 1/4 the training cost of the\nprevious state-of-the-art model. The Transformer (big) model trained for English-to-French used\ndropout ratePdrop = 0.1, instead of 0.3.\nFor the base models, we used a single model obtained by averaging the last 5 checkpoints, which",
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 1]\nentirely. Experiments on two machine translation tasks show these models to\nbe superior in quality while being more parallelizable and requiring signi\ufb01cantly\nless time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-\nto-German translation task, improving over the existing best results, including\nensembles, by over 2 BLEU. On the WMT 2014 English-to-French translation task,\nour model establishes a new single-model state-of-the-art BLEU score of 41.0 after\ntraining for 3.5 days on eight GPUs, a small fraction of the training costs of the\nbest models from the literature.\n1 Introduction\nRecurrent neural networks, long short-term memory [12] and gated recurrent [7] neural networks\nin particular, have been \ufb01rmly established as state of the art approaches in sequence modeling and\ntransduction problems such as language modeling and machine translation [ 29, 2, 5]. Numerous\nefforts have since continued to push the boundaries of recurrent language models and encoder-decoder",
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 8]\nTable 2: The Transformer achieves better BLEU scores than previous state-of-the-art models on the\nEnglish-to-German and English-to-French newstest2014 tests at a fraction of the training cost.\nModel\nBLEU Training Cost (FLOPs)\nEN-DE EN-FR EN-DE EN-FR\nByteNet [15] 23.75\nDeep-Att + PosUnk [32] 39.2 1.0\u00b7 1020\nGNMT + RL [31] 24.6 39.92 2.3\u00b7 1019 1.4\u00b7 1020\nConvS2S [8] 25.16 40.46 9.6\u00b7 1018 1.5\u00b7 1020\nMoE [26] 26.03 40.56 2.0\u00b7 1019 1.2\u00b7 1020\nDeep-Att + PosUnk Ensemble [32] 40.4 8.0\u00b7 1020\nGNMT + RL Ensemble [31] 26.30 41.16 1.8\u00b7 1020 1.1\u00b7 1021\nConvS2S Ensemble [8] 26.36 41.29 7.7\u00b7 1019 1.2\u00b7 1021\nTransformer (base model) 27.3 38.1 3.3 \u00b7 1018\nTransformer (big) 28.4 41.0 2.3\u00b7 1019\nLabel Smoothing During training, we employed label smoothing of value \u03f5ls = 0.1 [30]. This\nhurts perplexity, as the model learns to be more unsure, but improves accuracy and BLEU score.\n6 Results\n6.1 Machine Translation\nOn the WMT 2014 English-to-German translation task, the big transformer model (Transformer (big)"
+    ],
+    "confidence_score": 91.3,
+    "confidence_label": "High",
+    "is_fallback": false,
+    "num_chunks_retrieved": 3,
+    "grades": [
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "transformer_3",
+    "bucket": "single_doc",
+    "expected_source": "NIPS-2017-attention-is-all-you-need",
+    "question": "What kind of positional encoding does the Transformer use by default, and what alternative did the authors also test?",
+    "ground_truth": "By default it uses fixed sine and cosine functions of different frequencies (sinusoidal positional encoding) added to the input embeddings. They also tested learned positional embeddings and found nearly identical results, but kept the sinusoidal version because it may let the model extrapolate to sequence lengths longer than those seen during training.",
+    "answer": "The original Transformer model (as described in the \u201cAttention Is All You Need\u201d paper) injects positional information by **adding sinusoidal positional encodings** to the token embeddings. These fixed, mathematically\u2011generated encodings are the default choice because the architecture has no recurrence or convolution to capture order on its own.\n\nThe authors also experimented with an **alternative learned positional embedding**. In the ablation study shown in Table\u202f3 of the paper, they replace the sinusoidal functions with a set of trainable position vectors (\u201cpositional embedding instead of sinusoids\u201d), and report the resulting perplexity and BLEU scores. This shows that, besides the default sinusoidal scheme, a purely learned embedding can be used as a drop\u2011in replacement.",
+    "contexts": [
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 3]\nstandard learnable 1D position embeddings, since we have not observed signi\ufb01cant performance\ngains from using more advanced 2D-aware position embeddings (Appendix D.4). The resulting\nsequence of embedding vectors serves as input to the encoder.\nThe Transformer encoder (Vaswani et al., 2017) consists of alternating layers of multiheaded self-\nattention (MSA, see Appendix A) and MLP blocks (Eq. 2, 3). Layernorm (LN) is applied before\nevery block, and residual connections after every block (Wang et al., 2019; Baevski & Auli, 2019).\n3",
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 3]\nTransformer. The Transformer uses constant latent vector size D through all of its layers, so we\n\ufb02atten the patches and map to D dimensions with a trainable linear projection (Eq. 1). We refer to\nthe output of this projection as the patch embeddings.\nSimilar to BERT\u2019s[class] token, we prepend a learnable embedding to the sequence of embed-\nded patches (z0\n0 = xclass), whose state at the output of the Transformer encoder ( z0\nL) serves as the\nimage representation y (Eq. 4). Both during pre-training and \ufb01ne-tuning, a classi\ufb01cation head is at-\ntached to z0\nL. The classi\ufb01cation head is implemented by a MLP with one hidden layer at pre-training\ntime and by a single linear layer at \ufb01ne-tuning time.\nPosition embeddings are added to the patch embeddings to retain positional information. We use\nstandard learnable 1D position embeddings, since we have not observed signi\ufb01cant performance\ngains from using more advanced 2D-aware position embeddings (Appendix D.4). The resulting",
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 5]\nSimilarly to other sequence transduction models, we use learned embeddings to convert the input\ntokens and output tokens to vectors of dimensiondmodel. We also use the usual learned linear transfor-\nmation and softmax function to convert the decoder output to predicted next-token probabilities. In\nour model, we share the same weight matrix between the two embedding layers and the pre-softmax\nlinear transformation, similar to [24]. In the embedding layers, we multiply those weights by\u221admodel.\n3.5 Positional Encoding\nSince our model contains no recurrence and no convolution, in order for the model to make use of the\norder of the sequence, we must inject some information about the relative or absolute position of the\ntokens in the sequence. To this end, we add \"positional encodings\" to the input embeddings at the\n5",
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 9]\nTable 3: Variations on the Transformer architecture. Unlisted values are identical to those of the base\nmodel. All metrics are on the English-to-German translation development set, newstest2013. Listed\nperplexities are per-wordpiece, according to our byte-pair encoding, and should not be compared to\nper-word perplexities.\nN d model dff h d k dv Pdrop \u03f5ls\ntrain PPL BLEU params\nsteps (dev) (dev) \u00d7106\nbase 6 512 2048 8 64 64 0.1 0.1 100K 4.92 25.8 65\n(A)\n1 512 512 5.29 24.9\n4 128 128 5.00 25.5\n16 32 32 4.91 25.8\n32 16 16 5.01 25.4\n(B) 16 5.16 25.1 58\n32 5.01 25.4 60\n(C)\n2 6.11 23.7 36\n4 5.19 25.3 50\n8 4.88 25.5 80\n256 32 32 5.75 24.5 28\n1024 128 128 4.66 26.0 168\n1024 5.12 25.4 53\n4096 4.75 26.2 90\n(D)\n0.0 5.77 24.6\n0.2 4.95 25.5\n0.0 4.67 25.3\n0.2 5.47 25.7\n(E) positional embedding instead of sinusoids 4.92 25.7\nbig 6 1024 4096 16 0.3 300K 4.33 26.4 213\nIn Table 3 rows (B), we observe that reducing the attention key size dk hurts model quality. This"
+    ],
+    "confidence_score": 40.2,
+    "confidence_label": "Medium",
+    "is_fallback": false,
+    "num_chunks_retrieved": 4,
+    "grades": [
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "FAIL"
+  },
+  {
+    "id": "transformer_4",
+    "bucket": "single_doc",
+    "expected_source": "NIPS-2017-attention-is-all-you-need",
+    "question": "What are dmodel and dff (the inner feed-forward layer dimensionality) for the base Transformer model?",
+    "ground_truth": "dmodel = 512 and dff = 2048 for the base model.",
+    "answer": "The base Transformer model uses a model dimension (**d\u202fmodel**) of **512** and an inner feed\u2011forward layer dimension (**d\u202fff**) of **2048**. This is stated in the description of the position\u2011wise feed\u2011forward networks (where the input and output dimensionality is d\u202fmodel\u202f=\u202f512 and the inner layer has dimensionality d\u202fff\u202f=\u202f2048) and is also reflected in the \u201cbase\u201d row of the architecture variations table.",
+    "contexts": [
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 5]\nof the softmax which correspond to illegal connections. See Figure 2.\n3.3 Position-wise Feed-Forward Networks\nIn addition to attention sub-layers, each of the layers in our encoder and decoder contains a fully\nconnected feed-forward network, which is applied to each position separately and identically. This\nconsists of two linear transformations with a ReLU activation in between.\nFFN(x) = max(0,xW 1 +b1)W2 +b2 (2)\nWhile the linear transformations are the same across different positions, they use different parameters\nfrom layer to layer. Another way of describing this is as two convolutions with kernel size 1.\nThe dimensionality of input and output is dmodel = 512 , and the inner-layer has dimensionality\ndf f = 2048.\n3.4 Embeddings and Softmax\nSimilarly to other sequence transduction models, we use learned embeddings to convert the input\ntokens and output tokens to vectors of dimensiondmodel. We also use the usual learned linear transfor-",
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 9]\nTable 3: Variations on the Transformer architecture. Unlisted values are identical to those of the base\nmodel. All metrics are on the English-to-German translation development set, newstest2013. Listed\nperplexities are per-wordpiece, according to our byte-pair encoding, and should not be compared to\nper-word perplexities.\nN d model dff h d k dv Pdrop \u03f5ls\ntrain PPL BLEU params\nsteps (dev) (dev) \u00d7106\nbase 6 512 2048 8 64 64 0.1 0.1 100K 4.92 25.8 65\n(A)\n1 512 512 5.29 24.9\n4 128 128 5.00 25.5\n16 32 32 4.91 25.8\n32 16 16 5.01 25.4\n(B) 16 5.16 25.1 58\n32 5.01 25.4 60\n(C)\n2 6.11 23.7 36\n4 5.19 25.3 50\n8 4.88 25.5 80\n256 32 32 5.75 24.5 28\n1024 128 128 4.66 26.0 168\n1024 5.12 25.4 53\n4096 4.75 26.2 90\n(D)\n0.0 5.77 24.6\n0.2 4.95 25.5\n0.0 4.67 25.3\n0.2 5.47 25.7\n(E) positional embedding instead of sinusoids 4.92 25.7\nbig 6 1024 4096 16 0.3 300K 4.33 26.4 213\nIn Table 3 rows (B), we observe that reducing the attention key size dk hurts model quality. This"
+    ],
+    "confidence_score": 63.0,
+    "confidence_label": "Medium",
+    "is_fallback": false,
+    "num_chunks_retrieved": 2,
+    "grades": [
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "sql_1",
+    "bucket": "single_doc",
+    "expected_source": "To_RAG_or_Not_to_RAG (Shakespeare-SQL)",
+    "question": "What full coverage did Shakespeare-SQL achieve on the AmbiQT benchmark, and how many training examples did it use to get there?",
+    "ground_truth": "Shakespeare-SQL achieved 72.6% full coverage on AmbiQT using only 300 Ambrosia training examples, compared to DFPL's 53.2% despite DFPL being fine-tuned on the full 10,070-example AmbiQT training set.",
+    "answer": "Shakespeare\u2011SQL attained **72.6\u202f% full coverage on the schema\u2011ambiguous AmbiQT benchmark**. It reached this level of performance by training on **just 300 Ambrosia examples** (i.e., 300 training instances)\u202f\u2014\u202fa remarkably small dataset compared with prior work. This result is reported in the paper\u2019s introductory overview and reiterated in the results section (see the discussion of AmbiQT performance).",
+    "contexts": [
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 1]\nduring inference, limiting their practical deployment. We present two contributions to address this gap.\nFirst, we introduce Ambrosia+, a comprehensive benchmark that extends Ambrosia with 2535 unanswerable\nquestions, creating a total of 6777 examples spanning linguistic ambiguity (scope, attachment, vagueness)\nand unanswerability across 16 domains and multi-table databases. Second, we propose Shakespeare-SQL,\nan efficient modular framework that integrates adaptive question routing, hybrid retrieval combining structural\nand semantic similarity, and curriculum-based Group Relative Policy Optimization (GRPO) with AI feedback\nfor interpretation generation. Our framework achieves 72.6% full coverage on theschema-ambiguous AmbiQT\nbenchmark using only 300 training examples\u2014a 36.5% relative improvement over the state-of-the-art DFPL\n(53.2%). On Ambrosia+, Shakespeare-SQL achieves 73.0% full coverage compared to DFPL\u2019s 30.5%, while",
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 7]\nwithout flagging the query as unanswerable could lead\nsecurity engineers to falsely conclude that no platforms\nare exposed to the vulnerability, potentially leaving the\ndoor open to a threat actor.\nV. RESULTS\nA. MAIN RESUL TS\nTable 3 presents the performance of Shakespeare-SQL\ncompared to state-of-the-art baselines across four benchmarks.\nOur framework demonstrates substantial improvements in\naddressing Text-to-SQL ambiguity while requiring signifi-\ncantly less training data.\n1) AMBIQT PERFORMANCE\nOn schema-ambiguous questions, Shakespeare-SQL reaches\n72.6% full coverage using just 300 Ambrosia training\nexamples, compared to DFPL\u2019s 53.2%, even though DFPL was\nfine-tuned on the complete 10,070-example AmbiQT training\n1Common Vulnerabilities and Exposures.\n35446 VOLUME 14, 2026",
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 9]\nM. Hoang, V. K. Madisetti: To RAG or Not to RAG, That Is the Question\nTABLE 4. Classification accuracy rates across datasets and training setups.\nfewer on Ambrosia+ (776 vs. 6,831). Despite this efficiency,\nwe achieve better coverage on both benchmarks (72.6%\nvs. 53.2% on AmbiQT; 73.0% vs. 30.5% on Ambrosia +),\nshowing our approach generates higher-quality interpretations\nrather than just more of them.\nHaving established overall system performance, we now\nexamine the question classifier that enables Shakespeare-\nSQL\u2019s adaptive routing strategy.\nB. CLASSIFIER PERFORMANCE\nTable 4 analyzes router classification accuracy without\nthe agent\u2019s internal unanswerability validation, revealing\nwhy the router improves unanswerability detection while\noccasionally reducing coverage on answerable questions.\nThree configurations are evaluated: (1) Ambrosia +-only\ntraining, (2) Ambrosia + augmented with 200 AmbiQT\nand 200 SPIDER examples, and (3) Claude Sonnet 4.5 with\nfew-shot prompting."
+    ],
+    "confidence_score": 89.3,
+    "confidence_label": "High",
+    "is_fallback": false,
+    "num_chunks_retrieved": 3,
+    "grades": [
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "sql_2",
+    "bucket": "single_doc",
+    "expected_source": "To_RAG_or_Not_to_RAG (Shakespeare-SQL)",
+    "question": "What three categories does Shakespeare-SQL's Question Classifier route incoming questions into?",
+    "ground_truth": "Unanswerable (U), Answerable-Unambiguous (AU), and Answerable-Ambiguous (AA).",
+    "answer": "Shakespeare\u2011SQL\u2019s Question Classifier directs each incoming query into one of three distinct buckets:\n\n1. **Unanswerable (U)** \u2013 questions that cannot be answered given the available database schema.  \n2. **Answerable\u2011Unambiguous (AU)** \u2013 questions that have a single, clear interpretation and can go straight to SQL generation.  \n3. **Answerable\u2011Ambiguous (AA)** \u2013 questions that are answerable but admit multiple plausible interpretations, requiring an ambiguity\u2011type prediction and interpretation generation step.  \n\nThese three categories are described in the system overview of the paper (see the section on the \u201cQuestion Classifier & Unanswerability Validator\u201d).",
+    "contexts": [
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 4]\nlearning for ambiguous questions, then translates the\ninterpretations into SQL queries\n5) SQL Evaluator: Assesses query correctness through\nexecution-based metrics\n2) QUESTION CLASSIFIER & UNANSWERABILITY VALIDATOR\nThe framework begins by routing questions to appropriate\nprocessing paths. We employ a supervised fine-tuned\nDeBERTa base model (under 500 MB) that classifies questions\ninto three categories based on the encoded natural-language\nquestion and relevant database schema:\n\u2022 Unanswerable (U): Questions that cannot be answered\ngiven the database schema are routed directly to the\nevaluation agent without SQL generation. For example,\n\u2019 \u2019What is the average base salary for data architects?\u2019 \u2019\nis unanswerable when the schema does not contain\ncompensation data.\n\u2022 Answerable-Unambiguous (AU): Questions with a\nsingle clear interpretation bypass the interpretation gen-\neration step, proceeding directly to SQL generation. For\nexample, \u2019 \u2019Show me all employees whose home address",
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 4]\nRAG that automatically selects retrieval strategies based\non question characteristics during SQL generation (for AU\nand AA questions) and during interpretation generation (AA\nquestions).\na: AMBIGUITY TYPE PREDICTION\nFor AA questions, the system first predicts the ambiguity\ntype using a lightweight Linear Discriminant Analysis (LDA)\nclassifier trained on Ambrosia+\u2019s three ambiguity categories:\nscope, attachment, and vague. Each question is encoded\nusing sentence-transformers (all-MiniLM-L6-v2), then LDA\nprojects these embeddings into a 2-dimensional space that\nmaximizes separability among the three ambiguity types\n(Figure 2).\nb: ADAPTIVE RETRIEVAL STRATEGIES\nBased on predicted ambiguity type and confidence, the system\napplies different retrieval approaches:\n\u2022 Hybrid RAG: When the LDA classifier identifies\nscope/attachment ambiguity with confidence\u2265 0.7, the\nframework retrieves examples with the same ambiguity\ntype from the vector database, using a weighted 70%"
+    ],
+    "confidence_score": 81.7,
+    "confidence_label": "High",
+    "is_fallback": false,
+    "num_chunks_retrieved": 2,
+    "grades": [
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "sql_3",
+    "bucket": "single_doc",
+    "expected_source": "To_RAG_or_Not_to_RAG (Shakespeare-SQL)",
+    "question": "What reward model is used to score generated interpretations during the GRPO curriculum training of the interpretation generator?",
+    "ground_truth": "Claude Sonnet 4.5 (used as an LLM-as-judge to evaluate interpretation quality with temperature 0).",
+    "answer": "The reward model that scores the generated interpretations during the GRPO curriculum training of the interpretation generator is **Claude\u202fSonnet\u202f4.5**, which is used as the judge to produce the quality scores (see the description of Algorithm\u202f1 in the paper, page\u202f6).",
+    "contexts": [
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 5]\ncorrection prompt in Appendix G\n5) INTERPRETATION GENERATOR\nFor AA questions that require disambiguation, we fine-\ntune Llama-3.1-8B-Instruct using Group Relative Policy\nOptimization (GRPO) [32] with curriculum learning [33] and\nClaude Sonnet 4.5 as the reward model. Algorithm 1 details\nthe complete training procedure.\na: CURRICULUM LEARNING STRATEGY\nWe hypothesize that scope and attachment ambiguities follow\nstructural linguistic patterns that can be learned from relatively\nfew examples, while vagueness requires more extensive\ntraining to ground underspecified terms in a schema context.\nTo test this hypothesis, we apply curriculum learning that\nprogressively increases task difficulty across four training\nstages.\nFirst, we apply balanced sampling to address class\nimbalance, selecting 100 examples per ambiguity type (300\ntotal) from the original 1,026-example Ambrosia training set.\nThe curriculum then proceeds through four stages: scope\n\u2192 attachment\u2192 vague\u2192 mixed. We train on scope",
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 6]\nM. Hoang, V. K. Madisetti: To RAG or Not to RAG, That Is the Question\nAlgorithm 1 Curriculum GRPO Training With LLM-as-Judge\nReward\nInput: Dataset D={(s i, qi, I\u2217\ni , ai)}N\ni=1 where:\nsi = database schema/context\nqi = natural language question\nI\u2217\ni = gold interpretation\nai\u2208{scope, attachment, vague} is the ambiguity type\nlabel\nInput: Base policy \u03c0\u03b80 , curriculum C =\n[scope, attachment, vague,mixed]\nOutput: Optimized policy\u03c0\u03b8\u2217\n// Initialization\n\u03b8\u2190 InitializeLoRA(\u03b80, r=16,\u03b1=32, dropout=0.05)\nRsem: S/bracehtipupleft/bracehtipdownright/bracehtipdownleft/bracehtipupright\nschema\n\u00d7 Q/bracehtipupleft/bracehtipdownright/bracehtipdownleft/bracehtipupright\nquestion\n\u00d7 Y/bracehtipupleft/bracehtipdownright/bracehtipdownleft/bracehtipupright\ngenerated interp.\n\u00d7 I\u2217\n/bracehtipupleft/bracehtipdownright/bracehtipdownleft/bracehtipupright\ngold interp.\n\u2192 [0, 1]/bracehtipupleft/bracehtipdownright/bracehtipdownleft/bracehtipupright\nquality score\n{Claude Sonnet 4.5 as judge}",
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 13]\nis or isn\u2019t answerable, specifically listing what\u2019s missing or\navailable]\nAPPENDIX D\nPROMPTS FOR INTERPRETATION GENERATION DURING\nCURRICULUM GRPO TRAINING\nA. SYSTEM PROMPT\nY ou are an expert database question analyst specializing in\ndisambiguating ambiguous natural language queries.\nY our task: Given a database schema and an ambiguous\nquestion, identify and generate ALL semantically distinct\ninterpretations of the question.\nThe question can contain different types of linguistic\nambiguity:\n1. SCOPE AMBIGUITY: Quantifier scope (\u2018\u2018each\u2019\u2019,\n\u2018\u2018every\u2019\u2019, \u2018\u2018all\u2019\u2019) is unclear\n\u2022 Example: \u2018\u2018Show me the toys every cat has.\u2019\u2019\n\u2022 Collective interpretation (property shared by ALL entities\ntogether): \u2018\u2018List the toys that all cats have in common.\u2019\u2019\n\u2022 Distributive interpretation (property of EACH entity\nindividually): \u2018\u2018For each cat, list their toys.\u2019\u2019\n2. A TTACHMENT AMBIGUITY: \u2018\u2018X and Y [modifier]\u2019\u2019 -\nmodifier attachment is unclear\n\u2022 Example: \u2018\u2018Give me dogs and cats who are orange. Show"
+    ],
+    "confidence_score": 79.0,
+    "confidence_label": "High",
+    "is_fallback": false,
+    "num_chunks_retrieved": 3,
+    "grades": [
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "sql_4",
+    "bucket": "single_doc",
+    "expected_source": "To_RAG_or_Not_to_RAG (Shakespeare-SQL)",
+    "question": "What is the Ambrosia+ benchmark, and how many unanswerable questions does it add on top of the original Ambrosia benchmark?",
+    "ground_truth": "Ambrosia+ extends the original Ambrosia benchmark (4,242 answerable questions across 16 domains) by adding 2,535 unanswerable questions, generated using Claude Sonnet 4.5 and validated by human experts plus Qwen2.5-Coder-32B, for a total of 6,777 examples across 16 domains.",
+    "answer": "Ambrosia+ is an expanded version of the original Ambrosia benchmark. It keeps the same train\u2011validation\u2011test splits and the 4,242 answerable questions that cover 16 domains, but it adds a new set of unanswerable questions. Specifically, Ambrosia+ introduces **2,535 unanswerable questions**, bringing the total number of examples in the benchmark to 6,777. This augmentation allows researchers to evaluate how well text\u2011to\u2011SQL systems handle both linguistic ambiguity and cases where a query cannot be answered from the given database schema.",
+    "contexts": [
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 3]\ndescriptions, data coverage, data granularity, term\nambiguity, and expected output [26] or complex, costly\nfine-tuning.\nIII. PROPOSED SOLUTION\nBuilding on the work of Saparina and Lapata [16], [28],\nwe offer two contributions to this research area:\nA. AMBROSIA+\nAmbrosia+ benchmark extends the original Ambrosia bench-\nmark [16] (4,242 answerable questions across 16 domains) to\ninclude 2,535 unanswerable questions (Table 1). We main-\ntain DFPL\u2019s train-validation-test splits and generate three\nunanswerable questions for each of the 845 schemas using\nClaude Sonnet 4.5 and the prompt in Appendix A. Three data\nengineering experts validated the AI-generated unanswerable\nquestions over two weeks and identified answerable cases,\nwhich we revised to ensure that all 2,525 questions were\ntruly unanswerable. Finally, we used Qwen2.5-Coder-32B\nwith the prompt in Appendix B to validate the final question\nset once more, ensuring the unanswerable dataset is of",
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 1]\nduring inference, limiting their practical deployment. We present two contributions to address this gap.\nFirst, we introduce Ambrosia+, a comprehensive benchmark that extends Ambrosia with 2535 unanswerable\nquestions, creating a total of 6777 examples spanning linguistic ambiguity (scope, attachment, vagueness)\nand unanswerability across 16 domains and multi-table databases. Second, we propose Shakespeare-SQL,\nan efficient modular framework that integrates adaptive question routing, hybrid retrieval combining structural\nand semantic similarity, and curriculum-based Group Relative Policy Optimization (GRPO) with AI feedback\nfor interpretation generation. Our framework achieves 72.6% full coverage on theschema-ambiguous AmbiQT\nbenchmark using only 300 training examples\u2014a 36.5% relative improvement over the state-of-the-art DFPL\n(53.2%). On Ambrosia+, Shakespeare-SQL achieves 73.0% full coverage compared to DFPL\u2019s 30.5%, while"
+    ],
+    "confidence_score": 90.3,
+    "confidence_label": "High",
+    "is_fallback": false,
+    "num_chunks_retrieved": 2,
+    "grades": [
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "compare_1",
+    "bucket": "comparison",
+    "expected_source": "Transformers_For_Image_Recognition + NIPS-2017-attention-is-all-you-need",
+    "question": "Compare how the original Transformer paper and the ViT paper each define the 'tokens' fed into self-attention.",
+    "ground_truth": "In the original Transformer, tokens are word/subword embeddings in a natural language sequence, combined with positional encodings. In ViT, tokens are flattened image patches (e.g. 16x16 pixel blocks) linearly projected into embeddings, plus an extra learnable [class] token, with position embeddings added to retain spatial ordering -- ViT explicitly treats image patches the same way NLP treats words.",
+    "answer": "The original Transformer paper treats a token as a **textual element**\u2014typically a word\u2011piece or sub\u2011word unit that comes from a natural\u2011language sentence. Each token is first embedded into a vector, then the sequence of these embeddings is fed into the multi\u2011head self\u2011attention layers. In other words, the \u201ctokens\u201d are the discrete symbols that make up the input text (e.g., words or sub\u2011words)\u202f\u3010temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, page\u202f9\u3011.\n\nIn contrast, the Vision Transformer (ViT) paper reinterprets an image as a **sequence of visual tokens**. The image is first split into fixed\u2011size patches; each patch is flattened and linearly projected to obtain a patch embedding. In addition to all the patch embeddings, ViT inserts a special **[class] token** at the beginning of the sequence, which serves as the aggregate image representation for classification. This token sequence (class token\u202f+\u202fpatch tokens) is then processed by the same standard Transformer encoder used in NLP\u202f\u3010temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, page\u202f9\u3011. The authors note that this design mirrors the token handling in the original Transformer and that the class token\u2019s output is finally passed through a small MLP to produce the class prediction\u202f\u3010temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, page\u202f16\u3011.",
+    "contexts": [
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 16]\nIn order to stay as close as possible to the original Transformer model, we made use of an additional\n[class] token, which is taken as image representation. The output of this token is then trans-\nformed into a class prediction via a small multi-layer perceptron (MLP) with tanh as non-linearity\nin the single hidden layer.\nThis design is inherited from the Transformer model for text, and we use it throughout the main\npaper. An initial attempt at using only image-patch embeddings, globally average-pooling (GAP)\nthem, followed by a linear classi\ufb01er\u2014just like ResNet\u2019s \ufb01nal feature map\u2014performed very poorly.\nHowever, we found that this is neither due to the extra token, nor to the GAP operation. Instead,\n16",
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 9]\nusing self-attention in computer vision, we do not introduce image-speci\ufb01c inductive biases into\nthe architecture apart from the initial patch extraction step. Instead, we interpret an image as a\nsequence of patches and process it by a standard Transformer encoder as used in NLP. This simple,\nyet scalable, strategy works surprisingly well when coupled with pre-training on large datasets.\nThus, Vision Transformer matches or exceeds the state of the art on many image classi\ufb01cation\ndatasets, whilst being relatively cheap to pre-train.\nWhile these initial results are encouraging, many challenges remain. One is to apply ViT to other\ncomputer vision tasks, such as detection and segmentation. Our results, coupled with those in Carion\net al. (2020), indicate the promise of this approach. Another challenge is to continue exploring self-\nsupervised pre-training methods. Our initial experiments show improvement from self-supervised",
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 9]\nmulti-headed self-attention.\nFor translation tasks, the Transformer can be trained signi\ufb01cantly faster than architectures based\non recurrent or convolutional layers. On both WMT 2014 English-to-German and WMT 2014\nEnglish-to-French translation tasks, we achieve a new state of the art. In the former task our best\nmodel outperforms even all previously reported ensembles.\nWe are excited about the future of attention-based models and plan to apply them to other tasks. We\nplan to extend the Transformer to problems involving input and output modalities other than text and\nto investigate local, restricted attention mechanisms to ef\ufb01ciently handle large inputs and outputs\nsuch as images, audio and video. Making generation less sequential is another research goals of ours.\nThe code we used to train and evaluate our models is available at https://github.com/\ntensorflow/tensor2tensor.\nAcknowledgements We are grateful to Nal Kalchbrenner and Stephan Gouws for their fruitful"
+    ],
+    "confidence_score": 45.7,
+    "confidence_label": "Medium",
+    "is_fallback": false,
+    "num_chunks_retrieved": 3,
+    "grades": [
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "FAIL"
+  },
+  {
+    "id": "compare_2",
+    "bucket": "comparison",
+    "expected_source": "Transformers_For_Image_Recognition + NIPS-2017-attention-is-all-you-need",
+    "question": "Both papers considered learned versus fixed positional encodings. What did each paper conclude?",
+    "ground_truth": "The Transformer paper defaults to fixed sinusoidal positional encodings but found learned positional embeddings gave nearly identical results. ViT similarly found little to no difference between 1D learned embeddings, 2D-aware embeddings, and relative positional embeddings, and used standard learnable 1D position embeddings as its default. Both papers converge on the finding that the specific encoding scheme matters less than having positional information at all.",
+    "answer": "Both studies found that the choice between learned (trainable) positional embeddings and fixed (sinusoidal) positional encodings has only a marginal impact on performance.\n\n* In the Vision\u2011Transformer (ViT) ablation (see the ViT\u2011B/16 results on page\u202f18 of *temp_TRANSFORMERS\u202fFOR\u202fIMAGE\u202fRECOGNITION*), the authors observed a large drop when **no** positional information is supplied, but virtually no difference when comparing the various ways of providing it\u2014whether the embeddings are learned or fixed. They speculate that because the Transformer operates on a relatively low\u2011resolution grid of image patches (e.g.,\u202f14\u202f\u00d7\u202f14), the model can learn spatial relations easily regardless of the encoding scheme.\n\n* In the original \u201cAttention\u202fIs\u202fAll\u202fYou\u202fNeed\u201d paper (see page\u202f6 and page\u202f9 of *temp_NIPS\u20112017\u2011attention\u2011is\u2011all\u2011you\u2011need\u2011Paper*), the authors report that replacing the sinusoidal functions with learned positional embeddings yields \u201cnearly identical results\u201d (Table\u202f3, row\u202fE). They ultimately kept the sinusoidal version because it may allow extrapolation to longer sequences, but the empirical performance gap was negligible.\n\nThus, both papers conclude that learned positional embeddings and fixed sinusoidal encodings perform comparably, with the main takeaway being that providing some form of positional information is essential, while the specific encoding method matters little.",
+    "contexts": [
+      "[Document: temp_TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf, Page: 18]\nbeginning of each layer; (3) add a learned positional embeddings to the inputs at the beginning of\neach layer (shared between layers).\nTable 8 summarizes the results from this ablation study on a ViT-B/16 model. As we can see, while\nthere is a large gap between the performances of the model with no positional embedding and mod-\nels with positional embedding, there is little to no difference between different ways of encoding\npositional information. We speculate that since our Transformer encoder operates on patch-level\ninputs, as opposed to pixel-level, the differences in how to encode spatial information is less impor-\ntant. More precisely, in patch-level inputs, the spatial dimensions are much smaller than the original\npixel-level inputs, e.g., 14\u00d7 14 as opposed to 224\u00d7 224, and learning to represent the spatial re-\nlations in this resolution is equally easy for these different positional encoding strategies. Even so,",
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 6]\nPE (pos,2i) =sin(pos/100002i/dmodel)\nPE (pos,2i+1) =cos(pos/100002i/dmodel)\nwherepos is the position andi is the dimension. That is, each dimension of the positional encoding\ncorresponds to a sinusoid. The wavelengths form a geometric progression from 2\u03c0 to 10000\u00b7 2\u03c0. We\nchose this function because we hypothesized it would allow the model to easily learn to attend by\nrelative positions, since for any \ufb01xed offsetk,PE pos+k can be represented as a linear function of\nPE pos.\nWe also experimented with using learned positional embeddings [8] instead, and found that the two\nversions produced nearly identical results (see Table 3 row (E)). We chose the sinusoidal version\nbecause it may allow the model to extrapolate to sequence lengths longer than the ones encountered\nduring training.\n4 Why Self-Attention\nIn this section we compare various aspects of self-attention layers to the recurrent and convolu-",
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 9]\n(E) positional embedding instead of sinusoids 4.92 25.7\nbig 6 1024 4096 16 0.3 300K 4.33 26.4 213\nIn Table 3 rows (B), we observe that reducing the attention key size dk hurts model quality. This\nsuggests that determining compatibility is not easy and that a more sophisticated compatibility\nfunction than dot product may be bene\ufb01cial. We further observe in rows (C) and (D) that, as expected,\nbigger models are better, and dropout is very helpful in avoiding over-\ufb01tting. In row (E) we replace our\nsinusoidal positional encoding with learned positional embeddings [8], and observe nearly identical\nresults to the base model.\n7 Conclusion\nIn this work, we presented the Transformer, the \ufb01rst sequence transduction model based entirely on\nattention, replacing the recurrent layers most commonly used in encoder-decoder architectures with\nmulti-headed self-attention.\nFor translation tasks, the Transformer can be trained signi\ufb01cantly faster than architectures based",
+      "[Document: temp_To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf, Page: 19]\nM. Hoang, V. K. Madisetti: To RAG or Not to RAG, That Is the Question\n[36] T. Dettmers, A. Pagnoni, A. Holtzman, and L. Zettlemoyer, \u2018\u2018QLoRA:\nEfficient finetuning of quantized LLMs,\u2019\u2019 in Proc. Adv. Neural Inf.\nProcess. Syst., vol. 36. Curran Associates, Dec. 2023, pp. 10088\u201310115.\n[Online]. Available: https://proceedings.neurips.cc/paper_files/paper/\n2023/file/1feb87871436031bdc0f2beaa62a049b-Paper-Conference.pdf\n[37] Y . Bai et al., \u2018\u2018Constitutional AI: Harmlessness from AI feedback,\u2019\u2019 2022,\narXiv:2212.08073.\n[38] (2018). SPIDER: A Large-Scale Human-Labeled Dataset for Complex and\nCross-Domain Semantic Parsing and Text-to-SQL Task. [Online]. Available:\nhttps://yale-lily.github.io/spider\n[39] (2023). BIRD: Benchmark for Implicit Reasoning in Database Queries.\n[Online]. Available: https://bird-bench.github.io/\nMIA HOANG received the B.Sc. degree in\neconomics from Aalto University, Finland, the\nM.Sc. degree in management information systems\nand the M.B.A. degree from the University of"
+    ],
+    "confidence_score": 44.3,
+    "confidence_label": "Medium",
+    "is_fallback": false,
+    "num_chunks_retrieved": 4,
+    "grades": [
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Correct"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  },
+  {
+    "id": "unanswerable_1",
+    "bucket": "unanswerable",
+    "expected_source": null,
+    "question": "According to these documents, what was Google's market capitalization in 2021?",
+    "ground_truth": "Not answerable from these documents. None of the three papers (ViT, Attention Is All You Need, Shakespeare-SQL) discuss company financials or market capitalization; the system should decline or state insufficient information rather than fabricate a figure.",
+    "answer": "I\u2019m sorry\u2014I don\u2019t have the documents you\u2019re referring to. Could you please share the relevant excerpts or provide more details? Then I\u2019ll be able to help you determine Google\u2019s market capitalization in\u202f2021.",
+    "contexts": [],
+    "confidence_score": 0.0,
+    "confidence_label": "Low",
+    "is_fallback": true,
+    "num_chunks_retrieved": 0,
+    "grades": [
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": null
+  },
+  {
+    "id": "unanswerable_2",
+    "bucket": "unanswerable",
+    "expected_source": null,
+    "question": "What accuracy did Shakespeare-SQL achieve on the ImageNet classification benchmark?",
+    "ground_truth": "Not answerable / trick question. Shakespeare-SQL is a Text-to-SQL framework evaluated on AmbiQT, Ambrosia+, SPIDER, and BIRD -- it was never evaluated on ImageNet. ImageNet results in the corpus belong only to the ViT paper. The system should not conflate the two documents or invent a number.",
+    "answer": "I\u2019m not aware of any model or system named **\u201cShakespeare\u2011SQL\u201d** that has been evaluated on the ImageNet classification benchmark, so I don\u2019t have an accuracy figure to report. If you have more context (e.g., a paper title, authors, or a specific conference), I can try to look up the relevant results for you.",
+    "contexts": [],
+    "confidence_score": 0.0,
+    "confidence_label": "Low",
+    "is_fallback": true,
+    "num_chunks_retrieved": 0,
+    "grades": [
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": null
+  },
+  {
+    "id": "unanswerable_3",
+    "bucket": "unanswerable",
+    "expected_source": null,
+    "question": "How much GPU memory is required to train GPT-4 according to these papers?",
+    "ground_truth": "Not answerable from these documents. None of the three papers mention GPT-4 or its training hardware requirements; the system should decline rather than guess.",
+    "answer": "The provided excerpt discusses the training setup for the Transformer models described in the \u201cAttention Is All You Need\u201d paper, including details such as batch sizes, hardware (8\u202f\u00d7\u202fNVIDIA\u202fP100 GPUs), and training step times. However, it does not contain any information about the GPU memory requirements for training GPT\u20114. Consequently, based on the given context, I cannot specify how much GPU memory is needed to train GPT\u20114.",
+    "contexts": [
+      "[Document: temp_NIPS-2017-attention-is-all-you-need-Paper.pdf, Page: 7]\ntarget vocabulary of about 37000 tokens. For English-French, we used the signi\ufb01cantly larger WMT\n2014 English-French dataset consisting of 36M sentences and split tokens into a 32000 word-piece\nvocabulary [31]. Sentence pairs were batched together by approximate sequence length. Each training\nbatch contained a set of sentence pairs containing approximately 25000 source tokens and 25000\ntarget tokens.\n5.2 Hardware and Schedule\nWe trained our models on one machine with 8 NVIDIA P100 GPUs. For our base models using\nthe hyperparameters described throughout the paper, each training step took about 0.4 seconds. We\ntrained the base models for a total of 100,000 steps or 12 hours. For our big models,(described on the\nbottom line of table 3), step time was 1.0 seconds. The big models were trained for 300,000 steps\n(3.5 days).\n5.3 Optimizer\nWe used the Adam optimizer [17] with\u03b21 = 0.9,\u03b22 = 0.98 and\u03f5 = 10\u22129. We varied the learning\nrate over the course of training, according to the formula:"
+    ],
+    "confidence_score": 34.0,
+    "confidence_label": "Low",
+    "is_fallback": false,
+    "num_chunks_retrieved": 1,
+    "grades": [
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Ambiguous"
+      },
+      {
+        "source": "To_RAG_or_Not_to_RAG_That_Is_the_Question_Effective_Text-to-SQL_Generation_Under_Ambiguity.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "NIPS-2017-attention-is-all-you-need-Paper.pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      },
+      {
+        "source": "TRANSFORMERS FOR IMAGE RECOGNITION (1).pdf",
+        "label": "Incorrect"
+      }
+    ],
+    "verification_status": "PASS"
+  }
+]

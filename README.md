@@ -1,22 +1,22 @@
 # Corrective Hybrid Search RAG Assistant
 
 ## Project Overview
-The Corrective Hybrid RAG (Retrieval-Augmented Generation) Assistant is a powerful, locally-run AI application designed to intelligently query and chat with your PDF documents. It uses a combination of semantic search (FAISS) and keyword search (BM25) merged via Reciprocal Rank Fusion, followed by a Cross-Encoder reranking step to retrieve the most highly relevant context. 
+The Corrective Hybrid RAG (Retrieval-Augmented Generation) Assistant is a Streamlit-based application for searching, querying, and conversing over PDF documents.
 
-It is heavily upgraded with **Corrective RAG (CRAG)** principles: an LLM-based Document Grader evaluates every retrieved chunk for relevance, and an Adaptive Router handles conversational follow-ups. For multi-document comparisons, it employs a **Double Round-Robin** diversity filter to guarantee balanced, interleaving context across all uploaded PDFs.
+It implements a hybrid retrieval pipeline (FAISS + BM25) fused with Reciprocal Rank Fusion (RRF), followed by a cross-encoder reranker and a document-grade-based corrective loop (CRAG). The pipeline includes an adaptive router for follow-up detection, a document grader that prunes low-quality chunks, and diversity filtering for multi-document comparison queries.
 
 ## Features
-- **Multi-PDF Upload**: Drag and drop multiple PDF documents simultaneously.
-- **Corrective RAG (CRAG)**: A dedicated Document Grader evaluates chunks and strips irrelevant context before generation.
+- **Multi-PDF Upload**: Upload multiple PDF documents simultaneously via the Streamlit UI.
+- **Corrective RAG (CRAG)**: A document grader evaluates and filters retrieved chunks before generation.
 - **Double Round-Robin Comparison**: Automatically detects comparison queries and ensures all uploaded PDFs have an equal, balanced representation in the prompt to prevent "lost in the middle" errors.
-- **Conversational Memory & Intent Routing**: Remembers chat history and intelligently skips retrieval for conversational follow-ups.
+- **Conversational Memory & Intent Routing**: A small chat history window is kept to detect follow-ups that don't require retrieval.
 - **Hybrid Search**: Combines Dense (FAISS) and Sparse (BM25) vector retrieval for superior accuracy.
 - **Cross-Encoder Reranking**: Re-evaluates search results for precise, context-aware answers.
 - **Source Citations**: Transparently displays exactly which document and page the AI used to formulate its response.
 - **Retrieval Inspector**: A robust debug dashboard to view exact retrieved chunks, cross-encoder scores, routing paths, and CRAG grading results.
 
 ## Architecture
-The application follows an advanced Corrective RAG pipeline:
+The application follows the hybrid Corrective RAG pipeline (high level):
 
 ```mermaid
 graph TD
@@ -51,55 +51,74 @@ graph TD
 ```
 
 ## Tech Stack
-- **Frontend**: [Streamlit](https://streamlit.io/)
-- **LLM Engine**: Groq API (`llama-3.3-70b-versatile`)
-- **Embeddings**: sentence-transformers (`all-MiniLM-L6-v2`)
-- **Reranker**: sentence-transformers (`cross-encoder/ms-marco-MiniLM-L-6-v2`)
-- **Vector Database**: FAISS
-- **Keyword Search**: rank_bm25
-- **Document Framework**: LangChain (`PyPDFLoader`, `RecursiveCharacterTextSplitter`)
+- **Frontend**: Streamlit
+- **LLM Engine**: Groq API via `langchain-groq` (requires `GROQ_API_KEY` in `.env`)
+- **Embeddings**: HuggingFace / `sentence-transformers` (configurable via `config.py`)
+- **Reranker**: Cross-encoder (`cross-encoder/ms-marco-MiniLM-L-6-v2` by default)
+- **Vector Database**: FAISS (local on-disk index at `faiss_index/`)
+- **Keyword Search**: `rank_bm25` (local BM25 candidate generation)
+- **Document Framework**: LangChain document loaders and the RecursiveCharacterTextSplitter
 
 ## Installation
 
-1. **Clone the repository** (if applicable) and navigate to the project directory:
-   ```bash
-   cd hybrid-rag
-   ```
+1. Clone the repository and create/activate a Python virtual environment:
 
-2. **Create a virtual environment** (recommended):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use: venv\Scripts\activate
-   ```
+```bash
+python -m venv venv
+venv\Scripts\activate  # Windows
+```
 
-3. **Install the dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+2. Install dependencies:
 
-4. **Configure your environment**:
-   Create a `.env` file in the root directory and add your Groq API key:
-   ```env
-   GROQ_API_KEY=your_groq_api_key_here
-   ```
+```bash
+pip install -r requirements.txt
+```
+
+3. Configure environment variables (required):
+
+Create a `.env` file in the project root and at minimum set your Groq API key:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+Notes:
+- The LLM is provided via Groq (fast cloud inference). If you want to swap to another provider, update `rag/llm.py` and `config.py` accordingly.
+- FAISS indices persist to the `faiss_index/` folder (see `config.FAISS_INDEX_PATH`). Uploading PDFs in the app builds/saves the index.
 
 ## How to Run
 
-1. Start the Streamlit server:
-   ```bash
-   streamlit run app.py
-   ```
-2. Open your browser to the URL provided in the terminal (usually `http://localhost:8501`).
-3. Upload one or more PDFs using the sidebar or main uploader.
-4. Start chatting!
+1. Start the Streamlit UI:
+
+```bash
+streamlit run app.py
+```
+
+2. Open the URL shown by Streamlit (normally `http://localhost:8501`).
+
+3. Upload one or more PDFs via the uploader — this builds a FAISS index under `faiss_index/` and a BM25 index in-memory.
+
+4. Ask questions in the chat. The app will prefer RAG context when confidence is above the threshold configured in `config.py` and fall back to the LLM otherwise.
 
 
-## Future Improvements
-- **Agentic Workflows**: Introduce multi-step reasoning capabilities for complex queries.
-- **Additional File Formats**: Support for DOCX, TXT, and Markdown files.
-- **Persistent Vector Store**: Save and load FAISS indices across sessions to avoid re-processing large documents.
-- **Customizable Prompts**: Allow users to tweak the system prompt via the UI for specialized tasks.
+## Evaluation
+- An evaluation harness lives in `eval/`:
+   - `eval/run_harness.py` — run a question-answer harness against a dataset (builds answers using the same retrieval+generation pipeline). See header comments for usage (it expects `faiss_index/` to exist).
+   - `eval/run_ragas.py` — runs RAGAS scoring on `eval/harness_results.json` to report faithfulness, relevancy, precision and recall.
+
+Example commands:
+
+```bash
+python eval/run_harness.py --dataset eval/eval_dataset.json --out eval/harness_results.json
+python eval/run_ragas.py --results eval/harness_results.json
+```
+
+The eval harness writes `eval/harness_results.json`. `run_ragas.py` prints bucketed RAGAS scores and a routing accuracy summary for unanswerable items.
+
+## Where to change behavior
+- See `config.py` for model names, chunking, and retrieval thresholds.
+- `rag/vector_store.py`, `rag/bm25.py`, and `rag/retriever.py` contain the retrieval logic.
 
 ## Author
-**Moumita Paul**  
+**Moumita Paul**
 *IIIT Lucknow*

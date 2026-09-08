@@ -8,7 +8,7 @@ Change these values to swap models or adjust behavior.
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 # --- LLM (Groq API) ---
-GROQ_LLM_MODEL = "llama-3.3-70b-versatile"
+GROQ_LLM_MODEL = "openai/gpt-oss-120b"
 
 # --- Chunking ---
 CHUNK_SIZE = 1000
